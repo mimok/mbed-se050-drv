@@ -1,4 +1,4 @@
-/**
+/*
  * Copyright (c) 2020, Michael Grand
  * SPDX-License-Identifier: Apache-2.0
  *
@@ -18,7 +18,7 @@
 #include "apdu.h"
 #include <string.h>
 
-uint32_t setTLVU8(SE050_TAG_t tag, uint8_t *buff, uint8_t value, bool extended) {
+static uint32_t setTLVU8(SE050_TAG_t tag, uint8_t *buff, uint8_t value, bool extended) {
 
 	uint32_t i = 0;
 	buff[i++] = tag;
@@ -30,7 +30,7 @@ uint32_t setTLVU8(SE050_TAG_t tag, uint8_t *buff, uint8_t value, bool extended) 
 	return i;
 }
 
-uint32_t setTLVU16(SE050_TAG_t tag, uint8_t *buff, uint16_t value,
+static uint32_t setTLVU16(SE050_TAG_t tag, uint8_t *buff, uint16_t value,
 		bool extended) {
 
 	uint32_t i = 0;
@@ -44,7 +44,7 @@ uint32_t setTLVU16(SE050_TAG_t tag, uint8_t *buff, uint16_t value,
 	return i;
 }
 
-uint32_t setTLVU32(SE050_TAG_t tag, uint8_t *buff, uint32_t value,
+static uint32_t setTLVU32(SE050_TAG_t tag, uint8_t *buff, uint32_t value,
 		bool extended) {
 
 	uint32_t i = 0;
@@ -61,7 +61,7 @@ uint32_t setTLVU32(SE050_TAG_t tag, uint8_t *buff, uint32_t value,
 }
 
 //TODO: extended array 0x82?
-uint32_t setTLVarray(SE050_TAG_t tag, uint8_t *buff, const uint8_t *array,
+static uint32_t setTLVarray(SE050_TAG_t tag, uint8_t *buff, const uint8_t *array,
 		uint32_t len, bool extended) {
 
 	uint32_t i = 0;
@@ -80,7 +80,7 @@ uint32_t setTLVarray(SE050_TAG_t tag, uint8_t *buff, const uint8_t *array,
 	return i + len;
 }
 
-int32_t getTLVarray(SE050_TAG_t tag, uint8_t *buff, uint8_t *array[],
+static int32_t getTLVarray(SE050_TAG_t tag, uint8_t *buff, uint8_t *array[],
 		uint32_t *len, bool extended) {
 
 	if (tag != buff[0])
@@ -152,7 +152,7 @@ static int32_t getI2CMRsps(i2cm_tlv_t *tlv, uint8_t sz_tlv,
 }
 
 // does not support extend command
-apdu_status_t APDU_case4(const uint8_t *header, apdu_ctx_t *ctx) {
+static apdu_status_t APDU_case4(const uint8_t *header, apdu_ctx_t *ctx) {
 	ESESTATUS status = ESESTATUS_OK;
 
 	memmove(&ctx->in.p_data[5], &ctx->in.p_data[0], ctx->in.len);
@@ -217,7 +217,6 @@ apdu_status_t se050_connect(apdu_ctx_t *ctx) {
 	return APDU_OK;
 }
 
-//TODO: replace payload with applet version
 apdu_status_t se050_select(apdu_ctx_t *ctx) {
 
 	apdu_status_t status;
