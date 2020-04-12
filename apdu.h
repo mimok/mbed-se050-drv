@@ -57,6 +57,8 @@ typedef struct {
  * are stored in a single buffer.
  */
 typedef struct {
+	/// Structure containing a pointer to attested data and its length
+	phNxpEse_data data;
 	/// 16-byte Random returned by SE050
 	uint8_t *outrandom;
 	/// 18-byte ChipId returned by the SE050
@@ -109,22 +111,7 @@ typedef struct {
 	uint16_t sw;
 } apdu_ctx_t;
 
-
-//uint32_t setTLVU8(SE050_TAG_t tag, uint8_t *buff, uint8_t value, bool extended);
-//uint32_t setTLVU16(SE050_TAG_t tag, uint8_t *buff, uint16_t value,
-//		bool extended);
-//uint32_t setTLVU32(SE050_TAG_t tag, uint8_t *buff, uint32_t value,
-//		bool extended);
-//uint32_t setTLVarray(SE050_TAG_t tag, uint8_t *buff, const uint8_t *array,
-//		uint32_t len, bool extended);
-//int32_t getTLVarray(SE050_TAG_t tag, uint8_t *buff, uint8_t *array[],
-//		uint32_t *len, bool extended);
-
-
-apdu_status_t APDU_case4(const uint8_t *header, apdu_ctx_t *ctx);
-
 /**
- * @fn void se050_initApduCtx(apdu_ctx_t *ctx);
  * This command is used to initialize the APDU context structure.
  * @param ctx Pointer to an APDU context structure
  */

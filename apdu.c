@@ -260,9 +260,8 @@ apdu_status_t se050_i2cm_attestedCmds(uint8_t addr, uint8_t freq,
 
 	int32_t le = 0;
 	uint32_t fieldLen = 0;
-	phNxpEse_data rsp_tag1_tlv = { .len = 0, .p_data = NULL };
-	le += getTLVarray(SE050_TAG_1, &ctx->out.p_data[le], &rsp_tag1_tlv.p_data,
-			&rsp_tag1_tlv.len, false);
+	le += getTLVarray(SE050_TAG_1, &ctx->out.p_data[le], &attestation->data.p_data,
+			&attestation->data.len, false);
 	le += getTLVarray(SE050_TAG_3, &ctx->out.p_data[le],
 			&attestation->timeStamp, &fieldLen, false);
 	le += getTLVarray(SE050_TAG_4, &ctx->out.p_data[le],
@@ -274,7 +273,7 @@ apdu_status_t se050_i2cm_attestedCmds(uint8_t addr, uint8_t freq,
 	attestation->signature.len = fieldLen;
 	//ctx->out.len = le;
 
-	getI2CMRsps(tlv, sz_tlv, &rsp_tag1_tlv);
+	getI2CMRsps(tlv, sz_tlv, &attestation->data);
 
 	return APDU_OK;
 }
