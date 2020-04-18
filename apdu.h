@@ -18,8 +18,12 @@
 #ifndef SE050_DRV_APDU_H_
 #define SE050_DRV_APDU_H_
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 #include <stdint.h>
-#include "phNxpEse_Api.h"
+#include "T1oI2C/phNxpEse_Api.h"
 #include <stdbool.h>
 #include "se050_enums.h"
 
@@ -127,6 +131,13 @@ void se050_initApduCtx(apdu_ctx_t *ctx);
 apdu_status_t se050_connect(apdu_ctx_t *apdu_ctx);
 
 /**
+ * Disconnect from SE050 chip.
+ * @param ctx Pointer to an initialized APDU context structure
+ * @returns status indicating if disconnection is successful
+ */
+apdu_status_t se050_disconnect(apdu_ctx_t *ctx);
+
+/**
  * Allows select the applet programmed in the SE050 chip.
  * This command fills the firmware version filed of the APDU context.
  * @param ctx Pointer to an initialized APDU context structure
@@ -195,4 +206,7 @@ apdu_status_t se050_i2cm_attestedCmds(uint8_t addr, uint8_t freq,
 		i2cm_tlv_t *tlv, uint8_t sz_tlv, SE050_AttestationAlgo_t algo,
 		uint8_t *random, attestation_t *attestation, apdu_ctx_t *ctx);
 
+#ifdef __cplusplus
+}
+#endif
 #endif /* SE050_DRV_APDU_H_ */

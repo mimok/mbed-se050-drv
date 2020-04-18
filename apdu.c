@@ -177,8 +177,7 @@ static apdu_status_t APDU_case4(const uint8_t *header, apdu_ctx_t *ctx) {
 }
 
 void se050_initApduCtx(apdu_ctx_t *ctx) {
-	memset(&ctx->atr[0], 0, sizeof(ctx->atr));
-	memset(&ctx->version, 0, sizeof(ctx->version));
+	memset(ctx, 0, sizeof(apdu_ctx_t));
 	ctx->in.len = APDU_BUFF_SZ;
 	ctx->in.p_data = &ctx->buff[0];
 	ctx->out.len = 0;
@@ -205,15 +204,15 @@ apdu_status_t se050_connect(apdu_ctx_t *ctx) {
 	}
 	ctx->atrLen = ctx->out.len;
 	memcpy(ctx->atr, ctx->out.p_data, ctx->atrLen);
+	return APDU_OK;
+}
 
-	status = se050_select(ctx);
-	if(status != APDU_OK || ctx->sw != 0x9000)
+apdu_status_t se050_disconnect(apdu_ctx_t *ctx) {
+	ESESTATUS ret;
+	if(ESESTATUS_SUCCESS != phNxpEse_close())
 		return APDU_ERROR;
-	ctx->version.major = ctx->out.p_data[0];
-	ctx->version.minor = ctx->out.p_data[1];
-	ctx->version.patch = ctx->out.p_data[2];
-	ctx->version.appletConfig = ctx->out.p_data[3] << 8 | ctx->out.p_data[4];
-	ctx->version.secureBox = ctx->out.p_data[5] << 8 | ctx->out.p_data[6];
+	if(ESESTATUS_SUCCESS != phNxpEse_deInit())
+		return APDU_ERROR;
 	return APDU_OK;
 }
 
@@ -229,8 +228,14 @@ apdu_status_t se050_select(apdu_ctx_t *ctx) {
 	ctx->out.len = 0;
 
 	status = APDU_case4(&select_header[0], ctx);
-
-	return status;
+	if(status != APDU_OK || ctx->sw != 0x9000)
+		return APDU_ERROR;
+	ctx->version.major = ctx->out.p_data[0];
+	ctx->version.minor = ctx->out.p_data[1];
+	ctx->version.patch = ctx->out.p_data[2];
+	ctx->version.appletConfig = ctx->out.p_data[3] << 8 | ctx->out.p_data[4];
+	ctx->version.secureBox = ctx->out.p_data[5] << 8 | ctx->out.p_data[6];
+	return APDU_OK;
 }
 
 apdu_status_t se050_i2cm_attestedCmds(uint8_t addr, uint8_t freq,
