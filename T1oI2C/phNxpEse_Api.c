@@ -1,4 +1,5 @@
 /*
+ * Copyright 2020, Michael Grand
  * Copyright 2012-2014,2018-2019 NXP
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
@@ -18,6 +19,7 @@
 #include <phNxpEsePal_i2c.h>
 #include "log.h"
 #include "string.h"
+#include "mbed_thread.h"
 
 #define RECIEVE_PACKET_SOF      0xA5
 #define CHAINED_PACKET_WITHSEQN      0x60
@@ -411,7 +413,7 @@ static int phNxpEse_readPacket(void *pDevHandle, uint8_t * pBuffer, int nNbBytes
     {
         sof_counter++;
         ret = -1;
-        wait_ms(ESE_POLL_DELAY_MS); /* 1ms delay to give ESE polling delay */
+        thread_sleep_for(ESE_POLL_DELAY_MS); /* 1ms delay to give ESE polling delay */
         ret = phPalEse_i2c_read(pDevHandle, pBuffer, 2); /*read NAD PCB byte first*/
         if (ret < 0)
         {
@@ -481,12 +483,12 @@ static int phNxpEse_readPacket(void *pDevHandle, uint8_t * pBuffer, int nNbBytes
         if(poll_sof_chained_delay == 1)
         {
             LOG_D("%s Chained Pkt, delay read %dus",__FUNCTION__,ESE_POLL_DELAY_MS * CHAINED_PKT_SCALER);
-            wait_ms(ESE_POLL_DELAY_MS);
+            thread_sleep_for(ESE_POLL_DELAY_MS);
         }
         else
         {
             LOG_D("%s Normal Pkt, delay read %dus",__FUNCTION__,ESE_POLL_DELAY_MS * NAD_POLLING_SCALER);
-            wait_ms(ESE_POLL_DELAY_MS);
+            thread_sleep_for(ESE_POLL_DELAY_MS);
         }
     } while ((sof_counter < ESE_NAD_POLLING_MAX) && (nxpese_ctxt.EseLibStatus!= ESE_STATUS_CLOSE));
     if((pBuffer[0] == RECIEVE_PACKET_SOF) && (ret > 0))
