@@ -15,16 +15,16 @@
  * limitations under the License.
  */
 
-#include "../i2c.h"
+#include "i2c.h"
 #include "mbed.h"
 
 static I2C *i2cMbed;
 
 i2c_error_t axI2CInit(void)
 {
-    i2cMbed = new I2C(PB_9,PB_8);
+    i2cMbed = new I2C(MBED_CONF_TARGET_SE050_SDA, MBED_CONF_TARGET_SE050_SCL);
 
-    i2cMbed->frequency(400000);
+    i2cMbed->frequency(MBED_CONF_SE050_I2CM_FREQ);
 
     return I2C_OK;
 }

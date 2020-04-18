@@ -1,0 +1,13 @@
+{
+    "name": "se050",
+    "macros": [	
+		"T1oI2C",
+		"T1oI2C_UM1225_SE050"
+	],
+	"config": {
+      	"i2cm-freq": {
+    		"help": "SE050 I2CM bus frequency",
+    		"value" : "400000"
+    	}
+    }
+}
