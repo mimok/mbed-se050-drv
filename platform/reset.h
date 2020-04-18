@@ -18,6 +18,10 @@
 #ifndef MBED_SE050_DRV_PLATFORM_RESET_H_
 #define MBED_SE050_DRV_PLATFORM_RESET_H_
 
+#if defined(__cplusplus)
+extern "C"{
+#endif
+
 /**
  * Switch on the SE050 and attached I2C sensor power supply using SE050 ENA pin.
  * Sleep for 100ms after switch on to allow SE050 to boot.
@@ -33,5 +37,9 @@ void se050_powerOff(void);
  * Switch off then switch on the SE050 and attached I2C sensor power supply using SE050 ENA pin.
  */
 void se050_reset(void);
+
+#if defined(__cplusplus)
+}
+#endif
 
 #endif /* MBED_SE050_DRV_PLATFORM_RESET_H_ */
