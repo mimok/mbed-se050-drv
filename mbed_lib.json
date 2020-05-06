@@ -8,6 +8,10 @@
       	"i2cm-freq": {
     		"help": "SE050 I2CM bus frequency",
     		"value" : "400000"
+    	},
+      	"logen": {
+    		"help": "Logging T1oI2C exchange",
+    		"value" : "0"
     	}
     }
 }
