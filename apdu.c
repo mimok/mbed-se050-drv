@@ -18,6 +18,16 @@
 #include "apdu.h"
 #include <string.h>
 
+#define CHECK_IF_ERROR_AND_ACCUMULATE(tmp, acc) if(tmp > 0) {\
+													acc += tmp;\
+												} else {\
+													return APDU_ERROR;\
+												}
+
+#define CHECK_IF_ERROR(a)	if(a != APDU_OK) {\
+								return APDU_ERROR;\
+							}
+
 static uint32_t setTLVU8(SE050_TAG_t tag, uint8_t *buff, uint8_t value, bool extended) {
 
 	uint32_t i = 0;
@@ -80,11 +90,11 @@ static uint32_t setTLVarray(SE050_TAG_t tag, uint8_t *buff, const uint8_t *array
 	return i + len;
 }
 
-static int32_t getTLVarray(SE050_TAG_t tag, uint8_t *buff, uint8_t *array[],
+static uint32_t getTLVarray(SE050_TAG_t tag, uint8_t *buff, uint8_t *array[],
 		uint32_t *len, bool extended) {
 
 	if (tag != buff[0])
-		return -1;
+		return 0;
 
 	if (buff[1] == 0x82) { //extended
 		*len = buff[2] << 8 | buff[3];
@@ -193,14 +203,12 @@ apdu_status_t se050_connect(apdu_ctx_t *ctx) {
 	ret = phNxpEse_open(initParams);
 	if (ret != ESESTATUS_SUCCESS) {
 		return APDU_ERROR;
-		//MBED_ERROR(MBED_ERROR_CODE_OPEN_FAILED, "Can't connect to eSE");
 	}
 
 	ret = phNxpEse_init(initParams, &ctx->out);
 	if (ret != ESESTATUS_SUCCESS) {
 		ctx->payload.len = 0;
 		return APDU_ERROR;
-		//MBED_ERROR(MBED_ERROR_CODE_INITIALIZATION_FAILED, "Can't connect to eSE");
 	}
 	ctx->atrLen = ctx->out.len;
 	memcpy(ctx->atr, ctx->out.p_data, ctx->atrLen);
@@ -252,7 +260,7 @@ apdu_status_t se050_i2cm_attestedCmds(uint8_t addr, uint8_t freq,
 
 	uint32_t lc = 0;
 	lc += setTLVarray(SE050_TAG_1, &ctx->in.p_data[lc], &ctx->in.p_data[0],
-			cmdsLen, false); //pas possible car on ecrase data avec tag
+			cmdsLen, false);
 	lc += setTLVU32(SE050_TAG_2, &ctx->in.p_data[lc], 0xF0000012, false);
 	lc += setTLVU8(SE050_TAG_3, &ctx->in.p_data[lc], algo, false);
 	lc += setTLVarray(SE050_TAG_7, &ctx->in.p_data[lc], random, 16, false);
@@ -263,22 +271,27 @@ apdu_status_t se050_i2cm_attestedCmds(uint8_t addr, uint8_t freq,
 	if (ctx->sw != 0x9000 | ctx->out.len <= 0)
 		return APDU_ERROR;
 
-	int32_t le = 0;
+	uint32_t le = 0;
+	uint32_t tmp_le = 0;
 	uint32_t fieldLen = 0;
-	le += getTLVarray(SE050_TAG_1, &ctx->out.p_data[le], &attestation->data.p_data,
+	tmp_le = getTLVarray(SE050_TAG_1, &ctx->out.p_data[le], &attestation->data.p_data,
 			&attestation->data.len, false);
-	le += getTLVarray(SE050_TAG_3, &ctx->out.p_data[le],
+	CHECK_IF_ERROR_AND_ACCUMULATE(tmp_le, le);
+	tmp_le = getTLVarray(SE050_TAG_3, &ctx->out.p_data[le],
 			&attestation->timeStamp, &fieldLen, false);
-	le += getTLVarray(SE050_TAG_4, &ctx->out.p_data[le],
+	CHECK_IF_ERROR_AND_ACCUMULATE(tmp_le, le);
+	tmp_le = getTLVarray(SE050_TAG_4, &ctx->out.p_data[le],
 			&attestation->outrandom, &fieldLen, false);
-	le += getTLVarray(SE050_TAG_5, &ctx->out.p_data[le], &attestation->chipId,
+	CHECK_IF_ERROR_AND_ACCUMULATE(tmp_le, le);
+	tmp_le = getTLVarray(SE050_TAG_5, &ctx->out.p_data[le], &attestation->chipId,
 			&fieldLen, false);
-	le += getTLVarray(SE050_TAG_6, &ctx->out.p_data[le],
+	CHECK_IF_ERROR_AND_ACCUMULATE(tmp_le, le);
+	tmp_le = getTLVarray(SE050_TAG_6, &ctx->out.p_data[le],
 			&attestation->signature.p_data, &fieldLen, false);
+	CHECK_IF_ERROR_AND_ACCUMULATE(tmp_le, le);
 	attestation->signature.len = fieldLen;
-	//ctx->out.len = le;
 
-	getI2CMRsps(tlv, sz_tlv, &attestation->data);
+	CHECK_IF_ERROR(getI2CMRsps(tlv, sz_tlv, &attestation->data));
 
 	return APDU_OK;
 }
