@@ -1,4 +1,5 @@
 /*
+ * Copyright (c) 2020, Michael Grand
  * Copyright 2010-2014,2018-2019 NXP
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
@@ -44,11 +45,11 @@ void phPalEse_i2c_close(void *pDevHandle)
 {
     if (NULL != pDevHandle)
     {
-        #ifdef Android
-            close((intptr_t)pDevHandle);
-        #else
-            pDevHandle = NULL;
-        #endif
+    	/*
+    	 * Free I2C object instead of writing NULL in pDevHandle
+    	 * as in the NXP's original source code.
+    	 */
+    	axI2CClose();
     }
 
     return;

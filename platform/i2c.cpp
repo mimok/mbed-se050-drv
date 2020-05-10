@@ -57,3 +57,12 @@ i2c_error_t axI2CRead(unsigned char bus,
     }
     return I2C_OK;
 }
+
+i2c_error_t axI2CClose(void)
+{
+	if(i2cMbed != NULL)
+		delete i2cMbed;
+	else
+		return I2C_FAILED;
+    return I2C_OK;
+}

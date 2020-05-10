@@ -35,6 +35,7 @@ extern "C"{
 i2c_error_t axI2CInit( void );
 i2c_error_t axI2CWrite(unsigned char bus, unsigned char addr, unsigned char * pTx, unsigned short txLen);
 i2c_error_t axI2CRead(unsigned char bus, unsigned char addr, unsigned char * pRx, unsigned short rxLen);
+i2c_error_t axI2CClose(void);
 
 #if defined(__cplusplus)
 }

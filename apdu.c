@@ -219,8 +219,6 @@ apdu_status_t se050_disconnect(apdu_ctx_t *ctx) {
 	ESESTATUS ret;
 	if(ESESTATUS_SUCCESS != phNxpEse_close())
 		return APDU_ERROR;
-	if(ESESTATUS_SUCCESS != phNxpEse_deInit())
-		return APDU_ERROR;
 	return APDU_OK;
 }
 
